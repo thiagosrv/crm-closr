@@ -1,0 +1,422 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 1);
+  --radius-md: calc(var(--radius) * 1);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1);
+  --radius-2xl: calc(var(--radius) * 1);
+}
+
+/* ── Closr — White / Navy / Lime Neo Brutalism Theme ── */
+:root {
+  /* Base */
+  --background: #FFFFFF;
+  --foreground: #0F2044;
+
+  /* Surface cards */
+  --card: #FFFFFF;
+  --card-foreground: #0F2044;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F2044;
+
+  /* Primary = Azul Marinho */
+  --primary: #0F2044;
+  --primary-foreground: #FFFFFF;
+
+  /* Secondary = Verde Limão */
+  --secondary: #84CC16;
+  --secondary-foreground: #0F2044;
+
+  /* Muted */
+  --muted: #F4F4F4;
+  --muted-foreground: #6B7280;
+
+  /* Accent = Verde Limão */
+  --accent: #84CC16;
+  --accent-foreground: #0F2044;
+
+  /* Destructive */
+  --destructive: #DC2626;
+
+  /* Borders — solid navy */
+  --border: #0F2044;
+  --input: #FFFFFF;
+  --ring: #84CC16;
+
+  /* Charts */
+  --chart-1: #0F2044;
+  --chart-2: #84CC16;
+  --chart-3: #3B82F6;
+  --chart-4: #F59E0B;
+  --chart-5: #EF4444;
+
+  /* Radius — Windows 98 style: square */
+  --radius: 2px;
+
+  /* Sidebar — navy background */
+  --sidebar: #0F2044;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #84CC16;
+  --sidebar-primary-foreground: #0F2044;
+  --sidebar-accent: #1A3366;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #1A3366;
+  --sidebar-ring: #84CC16;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+
+  /* ── Overscroll lock: no white flash at scroll extremes ── */
+  html {
+    @apply font-sans;
+    overscroll-behavior: none;
+    /* Match the dashboard main bg so any slip is invisible */
+    background: #F4F4F4;
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+    /* Prevent iOS rubber-band showing white */
+    overscroll-behavior-y: none;
+    height: 100%;
+    /* Ensure body fills the screen */
+    min-height: 100dvh;
+  }
+}
+
+/* ══════════════════════════════════════════
+   NEO BRUTALISM — Core Utility Classes
+   Windows 98 aesthetic: square, bold, raw
+   ══════════════════════════════════════════ */
+
+/* Card padrão */
+.brutal-card {
+  background: #FFFFFF;
+  border: 2px solid #0F2044;
+  box-shadow: 4px 4px 0px #0F2044;
+  border-radius: 2px;
+}
+.brutal-card:hover {
+  box-shadow: 5px 5px 0px #0F2044;
+  transform: translate(-1px, -1px);
+  transition: box-shadow 0.08s ease, transform 0.08s ease;
+}
+
+/* Botão primário (navy) */
+.brutal-btn {
+  background: #0F2044;
+  color: #FFFFFF;
+  border: 2px solid #0F2044;
+  box-shadow: 3px 3px 0px #0F2044;
+  border-radius: 2px;
+  font-weight: 700;
+  transition: box-shadow 0.08s ease, transform 0.08s ease;
+}
+.brutal-btn:hover {
+  box-shadow: 5px 5px 0px #0F2044;
+  transform: translate(-2px, -2px);
+}
+.brutal-btn:active {
+  box-shadow: 1px 1px 0px #0F2044;
+  transform: translate(2px, 2px);
+}
+
+/* Botão lime (secundário) */
+.brutal-btn-lime {
+  background: #84CC16;
+  color: #0F2044;
+  border: 2px solid #0F2044;
+  box-shadow: 3px 3px 0px #0F2044;
+  border-radius: 2px;
+  font-weight: 700;
+  transition: box-shadow 0.08s ease, transform 0.08s ease;
+}
+.brutal-btn-lime:hover {
+  box-shadow: 5px 5px 0px #0F2044;
+  transform: translate(-2px, -2px);
+}
+.brutal-btn-lime:active {
+  box-shadow: 1px 1px 0px #0F2044;
+  transform: translate(2px, 2px);
+}
+
+/* Botão outline */
+.brutal-btn-outline {
+  background: #FFFFFF;
+  color: #0F2044;
+  border: 2px solid #0F2044;
+  box-shadow: 3px 3px 0px #0F2044;
+  border-radius: 2px;
+  font-weight: 700;
+  transition: box-shadow 0.08s ease, transform 0.08s ease;
+}
+.brutal-btn-outline:hover {
+  background: #F4F4F4;
+  box-shadow: 5px 5px 0px #0F2044;
+  transform: translate(-2px, -2px);
+}
+.brutal-btn-outline:active {
+  box-shadow: 1px 1px 0px #0F2044;
+  transform: translate(2px, 2px);
+}
+
+/* Input */
+.brutal-input {
+  background: #FFFFFF;
+  border: 2px solid #0F2044;
+  box-shadow: 2px 2px 0px #0F2044;
+  border-radius: 2px;
+  color: #0F2044;
+  transition: border-color 0.08s, box-shadow 0.08s;
+}
+.brutal-input:focus {
+  border-color: #84CC16;
+  box-shadow: 2px 2px 0px #84CC16;
+  outline: none;
+}
+.brutal-input::placeholder {
+  color: #9CA3AF;
+}
+
+/* Badge */
+.brutal-badge {
+  border: 2px solid currentColor;
+  border-radius: 2px;
+  font-weight: 800;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+}
+
+/* Heading */
+.brutal-heading {
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #0F2044;
+}
+
+/* Sidebar item ativo */
+.brutal-nav-active {
+  background: #84CC16 !important;
+  color: #0F2044 !important;
+  border-left: 4px solid #0F2044 !important;
+  font-weight: 800 !important;
+}
+
+/* Dialog / modal */
+.brutal-dialog {
+  background: #FFFFFF;
+  border: 3px solid #0F2044;
+  box-shadow: 6px 6px 0px #0F2044;
+  border-radius: 2px;
+}
+
+/* Section separator */
+.brutal-divider {
+  border: none;
+  border-top: 2px solid #0F2044;
+  margin: 1rem 0;
+}
+
+/* Tag / chip */
+.brutal-tag {
+  background: #F4F4F4;
+  border: 2px solid #0F2044;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  color: #0F2044;
+}
+.brutal-tag-lime {
+  background: #84CC16;
+  border: 2px solid #0F2044;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  color: #0F2044;
+}
+
+/* Table */
+.brutal-table {
+  border: 2px solid #0F2044;
+  border-radius: 2px;
+  border-collapse: collapse;
+  width: 100%;
+}
+.brutal-table th {
+  background: #0F2044;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 8px 12px;
+  border: 1px solid #1A3366;
+}
+.brutal-table td {
+  padding: 8px 12px;
+  border: 1px solid #0F2044;
+  color: #0F2044;
+  font-size: 0.875rem;
+}
+.brutal-table tr:hover td {
+  background: #F4F4F4;
+}
+
+/* Progress bar */
+.brutal-progress {
+  background: #F4F4F4;
+  border: 2px solid #0F2044;
+  border-radius: 2px;
+  height: 12px;
+  overflow: hidden;
+}
+.brutal-progress-bar {
+  background: #84CC16;
+  height: 100%;
+  border-right: 2px solid #0F2044;
+  transition: width 0.3s ease;
+}
+
+/* ── Kanban ── */
+.kanban-col {
+  overflow-y: auto;
+  max-height: calc(100vh - 11rem);
+}
+
+/* ── Animations ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+.animate-fade-in { animation: fadeInUp 0.18s ease-out; }
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in { animation: slideInLeft 0.18s ease-out; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #F4F4F4; border-left: 1px solid #0F2044; }
+::-webkit-scrollbar-thumb { background: #0F2044; border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: #1A3366; }
+
+/* ── Gradient text (logo) ── */
+.gradient-text {
+  background: linear-gradient(135deg, #0F2044 0%, #84CC16 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Login page inputs ── */
+.login-input {
+  background: #FFFFFF;
+  border: 2px solid #0F2044;
+  box-shadow: 3px 3px 0px #0F2044;
+  border-radius: 2px;
+  color: #0F2044;
+  transition: border-color 0.08s, box-shadow 0.08s;
+}
+.login-input:focus {
+  border-color: #84CC16;
+  box-shadow: 3px 3px 0px #84CC16;
+  outline: none;
+}
+.login-input::placeholder {
+  color: #9CA3AF;
+}
+
+/* ── Auth layout background ── */
+.auth-bg {
+  background: #F4F4F4;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 27px,
+      rgba(15, 32, 68, 0.07) 27px,
+      rgba(15, 32, 68, 0.07) 28px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 27px,
+      rgba(15, 32, 68, 0.07) 27px,
+      rgba(15, 32, 68, 0.07) 28px
+    );
+}
+
+/* ── Onboarding stepper ── */
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #D1D5DB;
+  border: 2px solid #0F2044;
+  transition: background 0.15s;
+}
+.step-dot.active {
+  background: #84CC16;
+}
+.step-dot.done {
+  background: #0F2044;
+}
+
+/* ── Pipeline stage accent ── */
+.stage-border-left {
+  border-left: 4px solid var(--stage-color, #0F2044);
+}

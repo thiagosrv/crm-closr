@@ -1,0 +1,430 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          UserRole  @default(REP)
+  plano         PlanoTipo @default(FREE)
+  theme         String    @default("dark")
+  teamId        String?
+  team          Team?     @relation(fields: [teamId], references: [id])
+  goal          Float     @default(0)
+  goalPeriod    String    @default("MENSAL")
+  timezone      String    @default("America/Sao_Paulo")
+  onboardingCompleted Boolean @default(false)
+  onboardingData      String?
+
+  assignedLeads   Lead[]           @relation("AssignedLeads")
+  assignedDeals   Deal[]           @relation("AssignedDeals")
+  activities      Activity[]
+  proposals       Proposal[]
+  accounts        Account[]
+  sessions        Session[]
+  channelSessions    ChannelSession[]
+  quickReplies       QuickReply[]
+  followUpSchedules  FollowUpSchedule[]
+  pipelineStages  PipelineStage[]
+  ownedContacts   Contact[]        @relation("ContactOwner")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  REP
+  VIEWER
+}
+
+enum PlanoTipo {
+  FREE
+  DIAMOND
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  territory   String?
+  members     User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PipelineStage {
+  id           String  @id @default(cuid())
+  name         String
+  order        Int
+  probability  Float   @default(0)
+  color        String  @default("#06B6D4")
+  rottingDays  Int     @default(14)
+  isClosedWon  Boolean @default(false)
+  isClosedLost Boolean @default(false)
+  deals        Deal[]
+
+  userId       String?
+  user         User?   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Contact {
+  id        String  @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  whatsapp  String?
+  company   String?
+  cnpj      String?
+  position  String?
+  linkedin  String?
+  instagram String?
+  website   String?
+  address   String?
+  city      String?
+  state     String?
+  country   String     @default("BR")
+  tags      String?
+  notes     String?
+  source    LeadSource @default(MANUAL)
+  isActive  Boolean    @default(true)
+
+  leads         Lead[]
+  deals         Deal[]
+  activities    Activity[]
+  proposals     Proposal[]
+  conversations Conversation[]
+
+  userId        String?
+  user          User?   @relation("ContactOwner", fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lead {
+  id             String     @id @default(cuid())
+  title          String
+  source         LeadSource @default(MANUAL)
+  status         LeadStatus @default(NEW)
+  score          Int        @default(0)
+  notes          String?
+  estimatedValue Float?
+  campaign       String?
+  utmSource      String?
+  utmMedium      String?
+  utmCampaign    String?
+
+  contactId       String?
+  contact         Contact?           @relation(fields: [contactId], references: [id])
+  assignedToId    String?
+  assignedTo      User?              @relation("AssignedLeads", fields: [assignedToId], references: [id])
+  convertedDealId String?
+  activities      Activity[]
+  conversations   Conversation[]
+  followUps       FollowUpSchedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum LeadSource {
+  MANUAL
+  WEBSITE
+  WHATSAPP
+  EMAIL
+  REFERRAL
+  LINKEDIN
+  COLD_CALL
+  EVENT
+  INSTAGRAM
+  FACEBOOK
+  ADS
+  OTHER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  DISQUALIFIED
+  CONVERTED
+}
+
+model Deal {
+  id            String     @id @default(cuid())
+  title         String
+  value         Float      @default(0)
+  currency      String     @default("BRL")
+  probability   Float?
+  expectedClose DateTime?
+  notes         String?
+  lostReason    String?
+  lostCategory  String?
+  wonAt         DateTime?
+  lostAt        DateTime?
+  status        DealStatus @default(OPEN)
+  stageHistory  String?
+
+  stageId      String
+  stage        PipelineStage @relation(fields: [stageId], references: [id])
+  contactId    String?
+  contact      Contact?      @relation(fields: [contactId], references: [id])
+  assignedToId String?
+  assignedTo   User?         @relation("AssignedDeals", fields: [assignedToId], references: [id])
+
+  activities    Activity[]
+  proposals     Proposal[]
+  conversations Conversation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum DealStatus {
+  OPEN
+  WON
+  LOST
+}
+
+model Activity {
+  id          String       @id @default(cuid())
+  type        ActivityType
+  subject     String
+  body        String?
+  dueAt       DateTime?
+  completedAt DateTime?
+  outcome     String?
+  duration    Int?
+  isAutomatic Boolean      @default(false)
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id])
+  dealId    String?
+  deal      Deal?    @relation(fields: [dealId], references: [id])
+  leadId    String?
+  lead      Lead?    @relation(fields: [leadId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ActivityType {
+  NOTE
+  CALL
+  EMAIL
+  WHATSAPP
+  MEETING
+  TASK
+  INACTIVITY_ALERT
+}
+
+model Proposal {
+  id             String         @id @default(cuid())
+  title          String
+  version        Int            @default(1)
+  status         ProposalStatus @default(DRAFT)
+  content        String
+  totalValue     Float          @default(0)
+  validUntil     DateTime?
+  sentAt         DateTime?
+  viewedAt       DateTime?
+  acceptedAt     DateTime?
+  declinedAt     DateTime?
+  trackingToken  String?        @unique
+  versionHistory String?
+
+  dealId    String?
+  deal      Deal?    @relation(fields: [dealId], references: [id])
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id])
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  VIEWED
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+model FollowUpRule {
+  id              String       @id @default(cuid())
+  name            String
+  triggerEvent    String
+  delayDays       Int          @default(0)
+  activityType    ActivityType
+  subjectTemplate String
+  bodyTemplate    String?
+  isActive        Boolean      @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String
+  isRead    Boolean  @default(false)
+  link      String?
+
+  createdAt DateTime @default(now())
+}
+
+// ─── Centro de Operações — WhatsApp ──────────────────────────────────────────
+
+model ChannelSession {
+  id          String   @id @default(cuid())
+  channel     String   @default("WHATSAPP")
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  status      String   @default("DISCONNECTED")
+  phoneNumber String?
+  sessionData String?
+
+  conversations Conversation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Conversation {
+  id               String         @id @default(cuid())
+  channelSessionId String
+  channelSession   ChannelSession @relation(fields: [channelSessionId], references: [id], onDelete: Cascade)
+  externalId       String
+  displayName      String?
+  lastMessageAt    DateTime?
+  unreadCount      Int            @default(0)
+
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id])
+  leadId    String?
+  lead      Lead?    @relation(fields: [leadId], references: [id])
+  dealId    String?
+  deal      Deal?    @relation(fields: [dealId], references: [id])
+
+  labels        ConversationLabel[]
+  messages      Message[]
+  followUps     FollowUpSchedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([channelSessionId, externalId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  externalId     String?
+  direction      String
+  type           String       @default("TEXT")
+  content        String
+  mediaUrl       String?
+  isRead         Boolean      @default(false)
+  sentAt         DateTime     @default(now())
+
+  createdAt DateTime @default(now())
+}
+
+model ConversationLabel {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  label          String
+  color          String       @default("#06B6D4")
+
+  createdAt DateTime @default(now())
+}
+
+model QuickReply {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  title   String
+  type    String @default("TEXT")
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FollowUpSchedule {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  leadId         String?
+  lead           Lead?         @relation(fields: [leadId], references: [id])
+  conversationId String?
+  conversation   Conversation? @relation(fields: [conversationId], references: [id])
+  message        String
+  scheduledAt    DateTime
+  status         String        @default("PENDING")
+  sentAt         DateTime?
+  cancelReason   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
