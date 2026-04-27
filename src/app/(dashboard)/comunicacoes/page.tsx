@@ -15,14 +15,19 @@ export default async function ComunicacoesPage() {
     select: { id: true },
   })
 
-  const isConfigured = !!(
-    process.env.WHATSAPP_ACCESS_TOKEN &&
-    process.env.WHATSAPP_PHONE_NUMBER_ID
-  )
+  // Check WhatsApp session in DB (Baileys-based, no env vars needed)
+  const channelSession = dbUser
+    ? await prisma.channelSession.findFirst({
+        where: { userId: dbUser.id, channel: "WHATSAPP" },
+        select: { status: true, phoneNumber: true },
+      })
+    : null
 
-  const conversations = dbUser && isConfigured
+  const isConnected = channelSession?.status === "CONNECTED"
+
+  const conversations = dbUser && isConnected
     ? await prisma.conversation.findMany({
-        where: { channelSession: { userId: dbUser.id } },
+        where: { channelSession: { userId: dbUser.id, channel: "WHATSAPP" } },
         include: {
           labels: true,
           contact: { select: { id: true, firstName: true, lastName: true } },
@@ -37,5 +42,11 @@ export default async function ComunicacoesPage() {
       })
     : []
 
-  return <ComunicacoesClient isConfigured={isConfigured} conversations={conversations} />
+  return (
+    <ComunicacoesClient
+      isConnected={isConnected}
+      phoneNumber={channelSession?.phoneNumber ?? null}
+      conversations={conversations}
+    />
+  )
 }

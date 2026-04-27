@@ -4,8 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
 }
 
 model User {
@@ -37,6 +36,8 @@ model User {
   followUpSchedules  FollowUpSchedule[]
   pipelineStages  PipelineStage[]
   ownedContacts   Contact[]        @relation("ContactOwner")
+  clientesAtivos  ClienteAtivo[]
+  clienteMeta     ClienteAtivoMeta?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -410,6 +411,53 @@ model QuickReply {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ─── Meus Clientes Ativos ────────────────────────────────────────────────────
+
+model ClienteAtivo {
+  id              String   @id @default(cuid())
+
+  // Identificação
+  empresa         String
+  contato         String?
+  email           String?
+  telefone        String?
+  segmento        String?
+
+  // Financeiro — valores mensais recorrentes
+  valorNota       Float    @default(0)   // Faturamento Bruto (valor da nota)
+  valorLiquido    Float    @default(0)   // Faturamento Líquido (após impostos)
+  impostos        Float    @default(0)   // Impostos (R$)
+  comissoes       Float    @default(0)   // Comissões pagas (R$)
+  custosExtras    Float    @default(0)   // Outros custos (transporte, materiais…)
+  custosFixos     Float    @default(0)   // Custos fixos alocados ao cliente
+  numeroPostos    Int      @default(1)   // Nº de postos/locais/funcionários alocados
+
+  // Metas
+  metaMensal      Float    @default(0)
+  metaAnual       Float    @default(0)
+
+  // Controle
+  status          String   @default("ATIVO")  // ATIVO | INATIVO | PROSPECCAO
+  observacoes     String?
+
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ClienteAtivoMeta {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id])
+  metaMensal  Float   @default(0)
+  metaAnual   Float   @default(0)
+  percPublicidade Float @default(10) // % saudável de investimento em publicidade
+
+  updatedAt   DateTime @updatedAt
 }
 
 model FollowUpSchedule {

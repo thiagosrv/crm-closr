@@ -17,16 +17,18 @@ import {
   Gem,
   Menu,
   X,
+  Building2,
 } from "lucide-react"
 
 const navItems = [
-  { label: "Início",             href: "/inicio",        icon: LayoutDashboard },
-  { label: "Comunicações",       href: "/comunicacoes",  icon: MessageSquare },
-  { label: "Funis de Venda",     href: "/funis",         icon: Kanban },
-  { label: "Calendário",         href: "/calendario",    icon: Calendar },
-  { label: "Listas de Contatos", href: "/contatos",      icon: Users },
-  { label: "Insights",           href: "/insights",      icon: BarChart3 },
-  { label: "Configurações",      href: "/configuracoes", icon: Settings },
+  { label: "Início",               href: "/inicio",           icon: LayoutDashboard },
+  { label: "Meus Clientes Ativos", href: "/clientes-ativos",  icon: Building2 },
+  { label: "Comunicações",         href: "/comunicacoes",     icon: MessageSquare },
+  { label: "Funis de Venda",       href: "/funis",            icon: Kanban },
+  { label: "Calendário",           href: "/calendario",       icon: Calendar },
+  { label: "Listas de Contatos",   href: "/contatos",         icon: Users },
+  { label: "Insights",             href: "/insights",         icon: BarChart3 },
+  { label: "Configurações",        href: "/configuracoes",    icon: Settings },
 ]
 
 function SidebarNav({ onClose }: { onClose?: () => void }) {

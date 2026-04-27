@@ -1,7 +1,7 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { getDashboardMetrics } from "@/server/queries/visao-geral"
-import { TrendingUp, Users, Target, MessageSquare, ArrowRight, Clock } from "lucide-react"
+import { TrendingUp, Users, Target, MessageSquare, ArrowRight, Clock, Building2 } from "lucide-react"
 import Link from "next/link"
 
 export default async function InicioPage() {
@@ -52,6 +52,16 @@ export default async function InicioPage() {
       contact: { select: { firstName: true, lastName: true } },
     },
   })
+
+  // Clientes Ativos summary
+  const clientesAtivos = dbUser
+    ? await prisma.clienteAtivo.findMany({
+        where: { userId: dbUser.id, status: "ATIVO" },
+        select: { valorNota: true, valorLiquido: true, impostos: true, comissoes: true, custosExtras: true, custosFixos: true },
+      })
+    : []
+  const faturamentoBrutoClientes = clientesAtivos.reduce((s, c) => s + c.valorNota, 0)
+  const lucroClientes = clientesAtivos.reduce((s, c) => s + c.valorLiquido - c.impostos - c.comissoes - c.custosExtras - c.custosFixos, 0)
 
   const firstName = dbUser?.name?.split(" ")[0] ?? "usuário"
 
@@ -115,6 +125,34 @@ export default async function InicioPage() {
           </div>
         ))}
       </div>
+
+      {/* Clientes Ativos banner (only if data exists) */}
+      {clientesAtivos.length > 0 && (
+        <Link
+          href="/clientes-ativos"
+          className="block brutal-card p-4 sm:p-5 transition-transform hover:-translate-y-0.5"
+          style={{ background: "#0F2044" }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 flex items-center justify-center shrink-0"
+                style={{ background: "#84CC16", border: "2px solid #84CC16" }}
+              >
+                <Building2 className="w-5 h-5 text-[#0F2044]" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Meus Clientes Ativos</p>
+                <p className="text-white font-black text-base">{clientesAtivos.length} cliente{clientesAtivos.length !== 1 ? "s" : ""} · Faturamento {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(faturamentoBrutoClientes)}/mês</p>
+              </div>
+            </div>
+            <div className="text-right shrink-0 ml-4">
+              <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Lucro Mensal</p>
+              <p className="font-black text-[#84CC16] text-lg">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(lucroClientes)}</p>
+            </div>
+          </div>
+        </Link>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Today's activities */}

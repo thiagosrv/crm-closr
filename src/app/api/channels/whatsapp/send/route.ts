@@ -2,7 +2,7 @@ export const runtime = "nodejs"
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { sendTextMessage } from "@/lib/channels/whatsapp-cloud"
+import { sendTextMessage } from "@/lib/channels/whatsapp"
 
 export async function POST(req: Request) {
   const session = await auth()
@@ -28,8 +28,8 @@ export async function POST(req: Request) {
     return Response.json({ error: "Conversation not found" }, { status: 404 })
   }
 
-  // Send via Meta Cloud API
-  await sendTextMessage(conversation.externalId, text)
+  // Send via Baileys
+  await sendTextMessage(dbUser.id, conversation.externalId, text)
 
   const msg = await prisma.message.create({
     data: {
