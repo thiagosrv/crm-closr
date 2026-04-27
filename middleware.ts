@@ -1,8 +1,12 @@
-import { auth } from "./auth"
+import NextAuth from "next-auth"
+import { authConfig } from "./auth.config"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-export default auth((req) => {
+// Middleware usa config leve (sem pg/prisma) — seguro para Edge Runtime
+const { auth } = NextAuth(authConfig)
+
+export default auth((req: NextRequest & { auth: { user?: unknown } | null }) => {
   const isLoggedIn = !!req.auth
   const { pathname } = req.nextUrl
   const isPublic =
@@ -16,7 +20,7 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/login", req.url))
   }
   if (isLoggedIn && (pathname === "/login" || pathname === "/register")) {
-    return NextResponse.redirect(new URL("/pipeline", req.url))
+    return NextResponse.redirect(new URL("/inicio", req.url))
   }
 })
 

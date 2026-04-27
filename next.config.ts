@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
     "node-cache",
     "pino",
     "pino-pretty",
+    "pg",
+    "pg-native",
+    "@prisma/adapter-pg",
+    "better-sqlite3",
   ],
 };
 
