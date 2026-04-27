@@ -9,9 +9,9 @@ export async function register() {
 
   try {
     const { prisma } = await import("@/lib/prisma")
-    const { connectWhatsApp } = await import("@/lib/channels/whatsapp")
 
     // Busca todas as sessões que tinham credenciais salvas
+    // Importa o WhatsApp APENAS se houver sessões — evita carregar Baileys desnecessariamente
     const sessions = await prisma.channelSession.findMany({
       where: {
         channel: "WHATSAPP",
@@ -20,9 +20,15 @@ export async function register() {
       select: { userId: true },
     })
 
+    // Inicia o scheduler de follow-ups independentemente de ter sessões
+    const { startFollowUpScheduler } = await import("@/lib/channels/whatsapp")
+    startFollowUpScheduler()
+
     if (sessions.length === 0) return
 
     console.log(`[Startup] Reconectando ${sessions.length} sessão(ões) WhatsApp...`)
+
+    const { connectWhatsApp } = await import("@/lib/channels/whatsapp")
 
     for (const session of sessions) {
       // Não aguarda — conecta em background para não atrasar o startup
@@ -32,6 +38,6 @@ export async function register() {
     }
   } catch (err) {
     // Nunca deve travar o startup do servidor
-    console.error("[Startup] Erro na reconexão automática do WhatsApp:", err)
+    console.error("[Startup] Erro na inicialização:", err)
   }
 }

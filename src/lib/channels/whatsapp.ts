@@ -304,7 +304,4 @@ export function startFollowUpScheduler(): void {
   }, 30_000) // check every 30 seconds
 }
 
-// Auto-start scheduler when this module is loaded (Node.js runtime only)
-if (typeof setInterval !== "undefined") {
-  startFollowUpScheduler()
-}
+// Scheduler is started explicitly from instrumentation.ts — NOT auto-started here
