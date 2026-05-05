@@ -5,6 +5,7 @@ import type { NextAuthConfig } from "next-auth"
  * Usado pelo middleware (Edge Runtime).
  */
 export const authConfig: NextAuthConfig = {
+  trustHost: true, // necessário para Railway/Vercel/domínios de produção
   pages: { signIn: "/login" },
   providers: [], // providers completos ficam em auth.ts
   callbacks: {
