@@ -32,11 +32,16 @@ export default function OnboardingPage() {
     setPlan(selectedPlan)
     setLoading(true)
     try {
-      await completeOnboarding({ firstName, lastName, teamSize, company, niche, interests, plan: selectedPlan })
+      const result = await completeOnboarding({ firstName, lastName, teamSize, company, niche, interests, plan: selectedPlan })
+      if (!result?.success) throw new Error("Falha ao salvar")
+      // Atualiza o token JWT com onboardingCompleted
       await update({ onboardingCompleted: true })
-      router.push("/inicio")
-    } catch {
+      // Força reload completo para o layout reler o DB
+      window.location.href = "/inicio"
+    } catch (err) {
+      console.error("Onboarding error:", err)
       setLoading(false)
+      alert("Erro ao salvar. Tente novamente.")
     }
   }
 

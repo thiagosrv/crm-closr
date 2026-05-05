@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/auth"
+import { prisma } from "@/lib/prisma"
 import { DashboardShell } from "@/components/layout/DashboardShell"
 
 export default async function DashboardLayout({
@@ -9,11 +10,22 @@ export default async function DashboardLayout({
 }) {
   const session = await auth()
 
-  if (!session) {
+  if (!session?.user) {
     redirect("/login")
   }
 
-  if (!session.user?.onboardingCompleted) {
+  // Checa onboardingCompleted direto no banco — mais confiável que sessão/JWT
+  const dbUser = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { id: session.user.id ?? "" },
+        ...(session.user.email ? [{ email: session.user.email }] : []),
+      ],
+    },
+    select: { onboardingCompleted: true },
+  })
+
+  if (!dbUser?.onboardingCompleted) {
     redirect("/onboarding")
   }
 
