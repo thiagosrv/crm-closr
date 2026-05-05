@@ -1,5 +1,5 @@
 "use client"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Loader2, Mail, Lock, User, ArrowRight, Zap, Check, RefreshCw } from "lucide-react"
@@ -10,6 +10,14 @@ type Step = "email" | "code" | "password"
 export default function RegisterPage() {
   const router = useRouter()
   const [step, setStep] = useState<Step>("email")
+  const [googleEnabled, setGoogleEnabled] = useState(false)
+
+  useEffect(() => {
+    fetch("/api/auth/providers")
+      .then(r => r.json())
+      .then(d => setGoogleEnabled(d.google))
+      .catch(() => {})
+  }, [])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [resendCooldown, setResendCooldown] = useState(0)
@@ -264,7 +272,7 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              <GoogleButton onClick={handleGoogle} label="Cadastrar com Google" />
+              {googleEnabled && <GoogleButton onClick={handleGoogle} label="Cadastrar com Google" />}
 
               <p className="text-center text-xs text-[#6B7280]">
                 Já tem conta?{" "}

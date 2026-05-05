@@ -12,15 +12,20 @@ const loginSchema = z.object({
   password: z.string().min(1),
 })
 
+// Google só é incluído se as credenciais estiverem configuradas
+const googleClientId = process.env.GOOGLE_CLIENT_ID
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET
+const googleProvider =
+  googleClientId && googleClientSecret
+    ? [Google({ clientId: googleClientId, clientSecret: googleClientSecret })]
+    : []
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
-    }),
+    ...googleProvider,
     Credentials({
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials)
